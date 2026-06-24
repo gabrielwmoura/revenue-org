@@ -97,7 +97,7 @@ html,body{height:100%;background:#141414;font-family:-apple-system,BlinkMacSyste
 .tab-projects .ca{height:20px;position:relative}
 .tab-projects .ca-sm{height:16px;position:relative}
 .tab-projects .ca svg,.tab-projects .ca-sm svg{position:absolute;inset:0;overflow:visible}
-.tab-projects .outer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.tab-projects .outer-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px}
 .tab-projects .sah{border:1.5px solid;border-radius:10px;padding:10px 16px;text-align:center;color:#fff;font-size:14px;font-weight:700;letter-spacing:0.01em}
 .tab-projects .sas{font-size:12px;color:#ccc;margin-top:6px;text-align:center;font-weight:600;letter-spacing:0.02em}
 .tab-projects .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -257,14 +257,7 @@ html,body{height:100%;background:#141414;font-family:-apple-system,BlinkMacSyste
             <div class="sas">Gabriel Walker</div>
             <div class="vl"><div class="vli"></div></div>
             <div class="ca-sm" id="vca"><svg></svg></div>
-            <div class="grid3">
-              <div id="v0">
-                <div class="ch" style="background:#6B4700">Gestão e Receita</div>
-                <div class="card"><div class="ct">CRM e Dados</div><div class="cs">Gabriel Walker</div></div>
-                <div class="card"><div class="ct">IA e Automações</div><div class="cs">Emília Alexandre</div></div>
-                <div class="card"><div class="ct">Novas Linhas de Receita</div><div class="cs">Gabriel Walker</div></div>
-                <div class="card"><div class="ct">Gestão e Resultados</div><div class="cs">Gabriel Walker</div></div>
-              </div>
+            <div class="grid2">
               <div id="v1">
                 <div class="ch" style="background:#1A4BA0">Operações Comerciais</div>
                 <div class="card"><div class="ct">Sales Enablement</div><div class="cs">Gabriel Walker</div></div>
@@ -295,6 +288,21 @@ html,body{height:100%;background:#141414;font-family:-apple-system,BlinkMacSyste
               <div class="card"><div class="ct">Brindes e Kits</div><div class="cs">Érica Sena</div></div>
               <div class="card"><div class="ct">TikTok Monitor</div><div class="cs">Julia Cavalari</div></div>
               <div class="card-d"><div class="dct">IPM on the Road</div><div class="dcs">a definir</div></div>
+            </div>
+          </div>
+
+          <!-- GESTÃO E RECEITA -->
+          <div id="r3">
+            <div class="sah" style="border-color:#D97706">Gestão e Receita</div>
+            <div class="sas">Gabriel Walker</div>
+            <div class="vl"><div class="vli"></div></div>
+            <div class="ca-sm" id="gca"><svg></svg></div>
+            <div id="g0">
+              <div class="ch" style="background:#6B4700">Estratégia & Inteligência</div>
+              <div class="card"><div class="ct">CRM e Dados</div><div class="cs">Gabriel Walker</div></div>
+              <div class="card"><div class="ct">IA e Automações</div><div class="cs">Emília Alexandre</div></div>
+              <div class="card"><div class="ct">Novas Linhas de Receita</div><div class="cs">Gabriel Walker</div></div>
+              <div class="card"><div class="ct">Gestão e Resultados</div><div class="cs">Gabriel Walker</div></div>
             </div>
           </div>
 
@@ -484,10 +492,11 @@ function conn(caId, ids) {
 }
 
 function drawConnectors() {
-  conn("rca", ["r0","r1","r2"]);
+  conn("rca", ["r0","r1","r2","r3"]);
   conn("mca", ["m0","m1","m2"]);
-  conn("vca", ["v0","v1","v2"]);
+  conn("vca", ["v1","v2"]);
   conn("eca", ["e0"]);
+  conn("gca", ["g0"]);
 }
 </script>
 </body>
