@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPM Educação · Revenue</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#141414;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+
+/* ── Password overlay ─────────────────────────────────────────────── */
+#pw-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+}
+#pw-overlay.hidden{display:none}
+.pw-box{
+  background:#111;border-radius:16px;
+  padding:40px 36px;width:360px;
+  border:1px solid #222;
+  text-align:center;
+}
+.pw-logo{display:flex;align-items:center;justify-content:center;margin-bottom:28px}
+.pw-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;letter-spacing:0.3px}
+.pw-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:22px}
+.pw-input{
+  width:100%;border:1px solid #333;border-radius:9px;
+  padding:11px 14px;font-size:14px;font-family:inherit;
+  outline:none;transition:border-color 0.15s;letter-spacing:1px;
+  text-align:center;color:#fff;background:#1a1a1a;
+}
+.pw-input:focus{border-color:#E05500}
+.pw-input.error{border-color:#e53e3e;animation:shake 0.3s ease}
+.pw-btn{
+  width:100%;margin-top:14px;
+  background:#E05500;color:#fff;
+  border:none;border-radius:9px;
+  padding:12px;font-size:13px;font-weight:800;
+  font-family:inherit;cursor:pointer;
+  letter-spacing:0.5px;transition:background 0.15s;
+}
+.pw-btn:hover{background:#c04a00}
+.pw-err{font-size:11px;color:#ff6b6b;margin-top:10px;height:16px}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%,60%{transform:translateX(-6px)}
+  40%,80%{transform:translateX(6px)}
+}
+
+/* ── App shell ────────────────────────────────────────────────────── */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.visible{display:flex}
+
+.app-header{
+  background:#1c1c1c;border-bottom:1px solid #2a2a2a;
+  padding:0 24px;
+  display:flex;align-items:center;gap:16px;
+  height:52px;flex-shrink:0;
+}
+.app-header-logo{display:flex;align-items:center}
+.app-header-title{font-size:12px;color:#666;font-weight:500;letter-spacing:0.05em}
+
+/* ── Tabs ─────────────────────────────────────────────────────────── */
+.tabs-bar{
+  background:#1c1c1c;border-bottom:1px solid #444;
+  display:flex;padding:0 24px;flex-shrink:0;
+}
+.tab-btn{
+  padding:14px 28px;font-size:14px;font-weight:600;
+  color:#888;background:none;border:none;cursor:pointer;
+  font-family:inherit;letter-spacing:0.03em;
+  border-bottom:2px solid transparent;
+  transition:color 0.15s,border-color 0.15s;
+  margin-bottom:-1px;
+}
+.tab-btn:hover{color:#ddd}
+.tab-btn.active{color:#fff;border-bottom-color:#E05500}
+
+/* ── Tab content ──────────────────────────────────────────────────── */
+.tab-panel{display:none;flex:1;overflow:auto}
+.tab-panel.active{display:block}
+
+/* ══════════════════════════════════════════════════════════════════
+   REVENUE PROJECTS styles (scoped to .tab-projects)
+   ══════════════════════════════════════════════════════════════════ */
+.tab-projects{padding:32px 20px}
+.tab-projects .scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
+.tab-projects .container{min-width:1300px;background:#1c1c1c;border-radius:12px;padding:24px}
+.tab-projects h1{text-align:center;color:#aaa;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:28px;font-weight:400}
+.tab-projects .receita-box{text-align:center;margin-bottom:0}
+.tab-projects .receita-title{display:inline-block;background:#1f1000;border:1.5px solid #E05500;border-radius:10px;padding:12px 60px;color:#fff;font-size:16px;font-weight:800;letter-spacing:0.02em;box-shadow:0 0 18px rgba(224,85,0,0.25)}
+.tab-projects .receita-person{font-size:12px;color:#ccc;font-weight:600;letter-spacing:0.02em;margin-top:6px}
+.tab-projects .vl{display:flex;justify-content:center;height:10px}
+.tab-projects .vli{width:1.5px;background:#444;height:100%}
+.tab-projects .ca{height:20px;position:relative}
+.tab-projects .ca-sm{height:16px;position:relative}
+.tab-projects .ca svg,.tab-projects .ca-sm svg{position:absolute;inset:0;overflow:visible}
+.tab-projects .outer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.tab-projects .sah{border:1.5px solid;border-radius:10px;padding:10px 16px;text-align:center;color:#fff;font-size:14px;font-weight:700;letter-spacing:0.01em}
+.tab-projects .sas{font-size:12px;color:#ccc;margin-top:6px;text-align:center;font-weight:600;letter-spacing:0.02em}
+.tab-projects .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tab-projects .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.tab-projects .ch{border-radius:6px;padding:7px 6px;text-align:center;color:#fff;font-weight:700;font-size:11px;margin-bottom:8px;line-height:1.3}
+.tab-projects .card{background:#282828;border:1px solid #3e3e3e;border-radius:6px;padding:8px 10px;margin-bottom:5px}
+.tab-projects .card-d{background:#1e1b14;border:1.5px dashed #8b6e14;border-radius:6px;padding:8px 10px;margin-bottom:5px}
+.tab-projects .ct{font-weight:600;font-size:12px;color:#ebebeb;line-height:1.3}
+.tab-projects .cs{font-size:11px;color:#888;margin-top:2px}
+.tab-projects .dct{font-weight:600;font-size:12px;color:#c9a227;font-style:italic;line-height:1.3}
+.tab-projects .dcs{font-size:11px;color:#8a7420;font-style:italic;margin-top:2px}
+.tab-projects .marca{background:#282828;border:1px solid #3e3e3e;border-radius:6px;padding:10px;text-align:center;color:#ddd;font-weight:600;font-size:12px;margin-top:14px}
+.tab-projects .legend{display:flex;gap:20px;justify-content:center;margin-top:16px;font-size:11px;color:#555}
+.tab-projects .legend-item{display:flex;align-items:center;gap:6px}
+.tab-projects .ld{width:10px;height:10px;border-radius:2px;background:#282828;border:1px solid #3e3e3e}
+.tab-projects .ldd{width:10px;height:10px;border-radius:2px;background:#1e1b14;border:1.5px dashed #8b6e14}
+
+/* ══════════════════════════════════════════════════════════════════
+   REVENUE WORKFORCE styles (scoped to .tab-workforce)
+   ══════════════════════════════════════════════════════════════════ */
+.tab-workforce{padding:32px 20px}
+.tab-workforce .wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-workforce .container{min-width:max-content;background:#1c1c1c;border-radius:12px;padding:32px 60px}
+.tab-workforce h1{text-align:center;color:#aaa;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:28px;font-weight:400}
+.tab-workforce .ot ul{padding-top:18px;position:relative;display:flex;list-style:none;justify-content:center;gap:0}
+.tab-workforce .ot ul::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:1.5px;height:18px;background:#383838}
+.tab-workforce .ot li{display:flex;flex-direction:column;align-items:center;padding:18px 7px 0;position:relative}
+.tab-workforce .ot li::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:1.5px;height:18px;background:#383838}
+.tab-workforce .ot li::after{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:#383838}
+.tab-workforce .ot li:first-child::after{left:50%}
+.tab-workforce .ot li:last-child::after{right:50%}
+.tab-workforce .ot li:only-child::after,.tab-workforce .ot>ul::before{display:none}
+.tab-workforce .ot>ul{padding-top:0}
+.tab-workforce .ot>ul>li{padding-top:0}
+.tab-workforce .ot>ul>li::before,.tab-workforce .ot>ul>li::after{display:none}
+.tab-workforce .sep{padding-left:24px!important;padding-right:24px!important}
+.tab-workforce .oc{border-radius:8px;padding:8px 12px;text-align:center;width:132px;word-break:break-word;box-sizing:border-box}
+.tab-workforce .on{font-size:11px;font-weight:700;color:#ebebeb;line-height:1.3}
+.tab-workforce .or{font-size:10px;color:#777;margin-top:2px;line-height:1.3}
+.tab-workforce .lf{background:#1a0d30;border:1.5px solid #7B4FC3}
+.tab-workforce .lc{background:#0a2018;border:1.5px solid #1D9E75}
+.tab-workforce .lh{background:#0a1828;border:1.5px solid #1A4BA0}
+.tab-workforce .lk{background:#280d1a;border:1.5px solid #B84070}
+.tab-workforce .lr{background:#242424;border:1px solid #3a3a3a}
+.tab-workforce .ld{background:#1e1b14;border:1.5px dashed #8b6e14}
+.tab-workforce .ld .on{color:#c9a227;font-style:italic}
+.tab-workforce .ld .or{color:#8a7420;font-style:italic}
+.tab-workforce .legend{display:flex;gap:16px;justify-content:center;margin-top:24px;flex-wrap:wrap;font-size:11px;color:#555;padding-top:14px;border-top:1px solid #282828}
+.tab-workforce .li{display:flex;align-items:center;gap:5px}
+.tab-workforce .lb{width:10px;height:10px;border-radius:2px}
+.tab-workforce .badge{display:inline-block;background:rgba(255,255,255,0.12);border-radius:20px;padding:1px 7px;font-size:9px;font-weight:700;color:#ccc;margin-left:5px;vertical-align:middle;letter-spacing:0.03em}
+</style>
+</head>
+<body>
+
+<!-- ── Password overlay ──────────────────────────────────────────── -->
+<div id="pw-overlay">
+  <div class="pw-box">
+    <div class="pw-logo">
+      <svg viewBox="0 0 733 247" height="52" xmlns="http://www.w3.org/2000/svg">
+        <path d="M303.449 60.3652L335.137 60.3652L335.137 91.6953L335.137 183.597L303.449 183.597L303.449 123.025L335.137 91.6953L303.449 91.6953L303.449 60.3652Z" fill="white"/>
+        <path d="M490.007 62.291L398.411 62.291L398.411 91.4542L490.007 91.4542L490.007 124.784L397.358 124.784L366.826 154.988L366.826 185.193L398.411 185.193L398.411 153.947L490.007 153.947L520.538 124.784L520.538 91.4542L490.007 62.291Z" fill="white"/>
+        <path d="M548.757 62.291L548.757 185.193L579.289 185.193L579.289 93.5373L640.352 123.742L701.416 94.5788L701.416 62.291L640.352 93.5373L579.289 62.291L548.757 62.291Z" fill="white"/>
+        <path d="M701.416 94.5781L733.001 94.5781L733.001 185.192L701.416 185.192L701.416 94.5781Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M245.92 0.441406L135.317 49.6126L122.949 61.9764V123.369L135.317 111.005L245.92 61.9764V0.441406Z" fill="#F15726"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0.441406L110.603 49.6126L122.971 61.9764V123.369L110.603 111.005L0 61.9764V0.441406Z" fill="#B84900"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M245.92 246.296L135.317 197.125L122.949 184.761V123.368L135.317 135.732L245.92 184.761V246.296Z" fill="#B84900"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 246.296L110.603 197.125L122.971 184.903V123.368L110.603 135.732L0 184.903V246.296Z" fill="#F15726"/>
+      </svg>
+    </div>
+    <div class="pw-title">Acesso restrito</div>
+    <div class="pw-sub">Insira a senha para visualizar os organogramas</div>
+    <input id="pw-input" class="pw-input" type="password" placeholder="••••••" autocomplete="off"/>
+    <button class="pw-btn" onclick="checkPw()">Entrar</button>
+    <div id="pw-err" class="pw-err"></div>
+  </div>
+</div>
+
+<!-- ── App shell ─────────────────────────────────────────────────── -->
+<div id="app">
+
+  <div class="app-header">
+    <div class="app-header-logo">
+      <svg viewBox="0 0 733 247" height="28" xmlns="http://www.w3.org/2000/svg">
+        <path d="M303.449 60.3652L335.137 60.3652L335.137 91.6953L335.137 183.597L303.449 183.597L303.449 123.025L335.137 91.6953L303.449 91.6953L303.449 60.3652Z" fill="white"/>
+        <path d="M490.007 62.291L398.411 62.291L398.411 91.4542L490.007 91.4542L490.007 124.784L397.358 124.784L366.826 154.988L366.826 185.193L398.411 185.193L398.411 153.947L490.007 153.947L520.538 124.784L520.538 91.4542L490.007 62.291Z" fill="white"/>
+        <path d="M548.757 62.291L548.757 185.193L579.289 185.193L579.289 93.5373L640.352 123.742L701.416 94.5788L701.416 62.291L640.352 93.5373L579.289 62.291L548.757 62.291Z" fill="white"/>
+        <path d="M701.416 94.5781L733.001 94.5781L733.001 185.192L701.416 185.192L701.416 94.5781Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M245.92 0.441406L135.317 49.6126L122.949 61.9764V123.369L135.317 111.005L245.92 61.9764V0.441406Z" fill="#F15726"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0.441406L110.603 49.6126L122.971 61.9764V123.369L110.603 111.005L0 61.9764V0.441406Z" fill="#B84900"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M245.92 246.296L135.317 197.125L122.949 184.761V123.368L135.317 135.732L245.92 184.761V246.296Z" fill="#B84900"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 246.296L110.603 197.125L122.971 184.903V123.368L110.603 135.732L0 184.903V246.296Z" fill="#F15726"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('projects', this)">Projetos</button>
+    <button class="tab-btn" onclick="switchTab('workforce', this)">Workforce</button>
+  </div>
+
+  <!-- ── Tab: Revenue Projects ────────────────────────────────────── -->
+  <div id="panel-projects" class="tab-panel active">
+    <div class="tab-projects">
+      <div class="scroll-wrap">
+      <div class="container">
+
+        <div class="receita-box">
+          <div class="receita-title">Receita</div>
+          <div class="receita-person">Gabriel Walker</div>
+        </div>
+        <div class="vl"><div class="vli"></div></div>
+        <div class="ca" id="rca"><svg></svg></div>
+
+        <div class="outer-grid">
+
+          <!-- MARKETING -->
+          <div id="r0">
+            <div class="sah" style="border-color:#1A4BA0">Marketing</div>
+            <div class="sas">João Branquinho</div>
+            <div class="vl"><div class="vli"></div></div>
+            <div class="ca-sm" id="mca"><svg></svg></div>
+            <div class="grid3">
+              <div id="m0">
+                <div class="ch" style="background:#1A4BA0">Aquisição</div>
+                <div class="card"><div class="ct">Social Media</div><div class="cs">Vanessa Chaves</div></div>
+                <div class="card"><div class="ct">Jornalismo e SEO</div><div class="cs">Erika Coelho</div></div>
+                <div class="card"><div class="ct">Mídia Paga</div><div class="cs">Henrique Cassela</div></div>
+                <div class="card"><div class="ct">Influenciadores</div><div class="cs">Esther Marchisotti</div></div>
+                <div class="card"><div class="ct">Perfil IG Professores IPM</div><div class="cs">Vanessa Chaves</div></div>
+                <div class="card-d"><div class="dct">IPM on the Road</div><div class="dcs">a definir</div></div>
+                <div class="card-d"><div class="dct">Embaixadores</div><div class="dcs">Gabriel Fayad</div></div>
+                <div class="card-d"><div class="dct">Eventos e Congressos</div><div class="dcs">a definir</div></div>
+              </div>
+              <div id="m1">
+                <div class="ch" style="background:#2D5218">Conteúdo</div>
+                <div class="card"><div class="ct">Social Media</div><div class="cs">Vanessa Chaves</div></div>
+                <div class="card"><div class="ct">Jornalismo e SEO</div><div class="cs">Erika Coelho</div></div>
+                <div class="card"><div class="ct">YouTube</div><div class="cs">Vanessa Chaves</div></div>
+                <div class="card"><div class="ct">Podcast</div><div class="cs">Giovanna Miranda</div></div>
+                <div class="card"><div class="ct">IPM Dicas</div><div class="cs">Lucas Lanfredi</div></div>
+                <div class="card"><div class="ct">Perfil IG Professores IPM</div><div class="cs">Vanessa Chaves</div></div>
+                <div class="card"><div class="ct">Hub de Conteúdo</div><div class="cs">João Branquinho</div></div>
+                <div class="card"><div class="ct">IPM Tech</div><div class="cs">Vanessa Chaves</div></div>
+              </div>
+              <div id="m2">
+                <div class="ch" style="background:#4A2475">OOH (Out of Home)</div>
+                <div class="card"><div class="ct">Outdoor</div><div class="cs">a definir</div></div>
+                <div class="card"><div class="ct">PR</div><div class="cs">a definir</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VENDAS -->
+          <div id="r1">
+            <div class="sah" style="border-color:#1D9E75">Vendas</div>
+            <div class="sas">Gabriel Walker</div>
+            <div class="vl"><div class="vli"></div></div>
+            <div class="ca-sm" id="vca"><svg></svg></div>
+            <div class="grid3">
+              <div id="v0">
+                <div class="ch" style="background:#6B4700">Gestão e Receita</div>
+                <div class="card"><div class="ct">CRM e Dados</div><div class="cs">Gabriel Walker</div></div>
+                <div class="card"><div class="ct">IA e Automações</div><div class="cs">Emília Alexandre</div></div>
+                <div class="card"><div class="ct">Novas Linhas de Receita</div><div class="cs">Gabriel Walker</div></div>
+                <div class="card"><div class="ct">Gestão e Resultados</div><div class="cs">Gabriel Walker</div></div>
+              </div>
+              <div id="v1">
+                <div class="ch" style="background:#1A4BA0">Operações Comerciais</div>
+                <div class="card"><div class="ct">Sales Enablement</div><div class="cs">Gabriel Walker</div></div>
+                <div class="card"><div class="ct">Inside Sales</div><div class="cs">Gabriel Walker</div></div>
+                <div class="card"><div class="ct">Gestão de Contratos</div><div class="cs">Pedro Pimenta</div></div>
+                <div class="card"><div class="ct">Financeiro</div><div class="cs">Gabriel Amorim</div></div>
+              </div>
+              <div id="v2">
+                <div class="ch" style="background:#2D5218">Canais de Parceria</div>
+                <div class="card"><div class="ct">Embaixadores</div><div class="cs">Gabriel Fayad</div></div>
+                <div class="card"><div class="ct">Influenciadores</div><div class="cs">Esther Marchisotti</div></div>
+                <div class="card"><div class="ct">B2B</div><div class="cs">Gabriel Fayad</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ENCANTAMENTO -->
+          <div id="r2">
+            <div class="sah" style="border-color:#B84070">Encantamento</div>
+            <div class="sas">Giovanna Miranda</div>
+            <div class="vl"><div class="vli"></div></div>
+            <div class="ca-sm" id="eca"><svg></svg></div>
+            <div id="e0">
+              <div class="ch" style="background:#6B4700">Experiência e Relacionamento</div>
+              <div class="card"><div class="ct">IPM Experience</div><div class="cs">Giovanna Miranda</div></div>
+              <div class="card"><div class="ct">IPM Bus</div><div class="cs">Érica Sena</div></div>
+              <div class="card"><div class="ct">Plataforma</div><div class="cs">Julia Cavalari</div></div>
+              <div class="card"><div class="ct">Brindes e Kits</div><div class="cs">Érica Sena</div></div>
+              <div class="card"><div class="ct">TikTok Monitor</div><div class="cs">Julia Cavalari</div></div>
+              <div class="card-d"><div class="dct">IPM on the Road</div><div class="dcs">a definir</div></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="marca">Marca</div>
+
+        <div class="legend">
+          <div class="legend-item"><div class="ld"></div><span>Frente ativa com responsável</span></div>
+          <div class="legend-item"><div class="ldd"></div><span>A estruturar</span></div>
+        </div>
+
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tab: Revenue Workforce ───────────────────────────────────── -->
+  <div id="panel-workforce" class="tab-panel">
+    <div class="tab-workforce">
+      <div class="wrap">
+      <div class="container">
+      <div class="ot">
+      <ul><li>
+        <div class="oc lf"><div class="on">Pedro Miranda</div><div class="or">CEO / Founder</div></div>
+        <ul><li>
+          <div class="oc lc"><div class="on">Gabriel Walker</div><div class="or">CRO — Diretor de Receita</div></div>
+          <ul>
+
+            <li>
+              <div class="oc lr" style="width:152px">
+                <div class="on">Emília Alexandre</div>
+                <div class="or">RevOps &amp; Automações</div>
+              </div>
+            </li>
+
+            <li class="sep">
+              <div class="oc lh"><div class="on">João Branquinho <span class="badge">17</span></div><div class="or">Head de Marketing</div></div>
+              <ul>
+                <li><div class="oc lr"><div class="on">Henrique Cassela</div><div class="or">Gestor de Mídia Paga</div></div></li>
+                <li>
+                  <div class="oc lk"><div class="on">Erika Coelho</div><div class="or">Coord. Jornalismo e SEO</div></div>
+                  <ul><li><div class="oc lr"><div class="on">Fabíola</div><div class="or">SEO</div></div></li></ul>
+                </li>
+                <li>
+                  <div class="oc lk"><div class="on">Vanessa Chaves</div><div class="or">Coord. Conteúdo e Social Media</div></div>
+                  <ul>
+                    <li><div class="oc lr"><div class="on">Raglebya Pires</div><div class="or">Social Media</div></div></li>
+                    <li><div class="oc lr"><div class="on">Fernando</div><div class="or">Social Media &amp; Copy</div></div></li>
+                    <li><div class="oc lr"><div class="on">Julia Cavalari</div><div class="or">Analista de Marketing</div></div></li>
+                  </ul>
+                </li>
+                <li>
+                  <div class="oc lk"><div class="on">Linconl Gomes</div><div class="or">Coord. de Design e Criação</div></div>
+                  <ul><li>
+                    <div class="oc lr"><div class="on">Sara</div><div class="or">Supervisora de Design</div></div>
+                    <ul>
+                      <li><div class="oc lr"><div class="on">Nathan</div><div class="or">Designer</div></div></li>
+                      <li><div class="oc lr"><div class="on">Enoque</div><div class="or">Designer</div></div></li>
+                      <li><div class="oc lr"><div class="on">Vitor Marcos</div><div class="or">Designer</div></div></li>
+                      <li><div class="oc lr"><div class="on">Ana Beatriz</div><div class="or">Diagramação</div></div></li>
+                    </ul>
+                  </li></ul>
+                </li>
+                <li>
+                  <div class="oc lk"><div class="on">Esther Marchisotti</div><div class="or">Coord. de Influenciadores</div></div>
+                  <ul><li><div class="oc lr"><div class="on">Luís Felipe</div><div class="or">Analista de Marketing</div></div></li></ul>
+                </li>
+                <li><div class="oc lr"><div class="on">Fontenelle</div><div class="or">Editor de Vídeo</div></div></li>
+              </ul>
+            </li>
+
+            <li class="sep">
+              <div class="oc lh"><div class="on">Giovanna Miranda <span class="badge">2</span></div><div class="or">Head de Encantamento</div></div>
+              <ul>
+                <li><div class="oc lr"><div class="on">Julia Cavalari</div><div class="or">Plataforma · TikTok Monitor</div></div></li>
+              </ul>
+            </li>
+
+            <li class="sep">
+              <div class="oc lh"><div class="on">Gabriel Walker <span class="badge">5</span></div><div class="or">Head de Vendas</div></div>
+              <ul>
+                <li><div class="oc ld"><div class="on">Gabriel Fayad</div><div class="or">Embaixadores · B2B</div></div></li>
+                <li><div class="oc lr"><div class="on">Pedro Pimenta</div><div class="or">SDR</div></div></li>
+                <li><div class="oc lr"><div class="on">João Pedro</div><div class="or">SDR</div></div></li>
+                <li><div class="oc lr"><div class="on">Diogo Ferazzo</div><div class="or">Closer</div></div></li>
+                <li><div class="oc lr"><div class="on">Henrique Carvalho</div><div class="or">Closer</div></div></li>
+                <li><div class="oc lr"><div class="on">Paulo César</div><div class="or">Closer</div></div></li>
+              </ul>
+            </li>
+
+          </ul>
+        </li></ul>
+      </li></ul>
+      </div>
+
+      <div class="legend">
+        <div class="li"><div class="lb" style="background:#1a0d30;border:1.5px solid #7B4FC3"></div>Fundador</div>
+        <div class="li"><div class="lb" style="background:#0a2018;border:1.5px solid #1D9E75"></div>Diretor de Receita</div>
+        <div class="li"><div class="lb" style="background:#0a1828;border:1.5px solid #1A4BA0"></div>Head de Área</div>
+        <div class="li"><div class="lb" style="background:#280d1a;border:1.5px solid #B84070"></div>Coordenador</div>
+        <div class="li"><div class="lb" style="background:#242424;border:1px solid #3a3a3a"></div>Time</div>
+        <div class="li"><div class="lb" style="background:#1e1b14;border:1.5px dashed #8b6e14"></div>A estruturar</div>
+      </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CORRECT = "IPM@1";
+const PW_KEY  = "ipm_org_auth";
+
+function checkPw() {
+  var val = document.getElementById("pw-input").value;
+  if (val === CORRECT) {
+    sessionStorage.setItem(PW_KEY, "1");
+    unlock();
+  } else {
+    var inp = document.getElementById("pw-input");
+    inp.classList.add("error");
+    document.getElementById("pw-err").textContent = "Senha incorreta. Tente novamente.";
+    inp.value = "";
+    setTimeout(function(){ inp.classList.remove("error"); }, 400);
+  }
+}
+
+function unlock() {
+  document.getElementById("pw-overlay").classList.add("hidden");
+  document.getElementById("app").classList.add("visible");
+  restoreTab();
+  drawConnectors();
+}
+
+document.getElementById("pw-input").addEventListener("keydown", function(e){
+  if (e.key === "Enter") checkPw();
+});
+
+if (sessionStorage.getItem(PW_KEY) === "1") {
+  unlock();
+}
+
+// ── Tab switching ────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+  document.querySelectorAll(".tab-panel").forEach(function(p){ p.classList.remove("active"); });
+  btn.classList.add("active");
+  document.getElementById("panel-" + name).classList.add("active");
+  sessionStorage.setItem("ipm_org_tab", name);
+  if (name === "projects") {
+    requestAnimationFrame(function(){ requestAnimationFrame(drawConnectors); });
+  }
+}
+
+function restoreTab() {
+  var saved = sessionStorage.getItem("ipm_org_tab");
+  if (saved && saved !== "projects") {
+    var btns = document.querySelectorAll(".tab-btn");
+    btns.forEach(function(b){
+      if (b.textContent.trim().toLowerCase().indexOf(saved) !== -1 ||
+          b.getAttribute("onclick").indexOf("'" + saved + "'") !== -1) {
+        switchTab(saved, b);
+      }
+    });
+  }
+}
+
+// ── SVG connectors for Revenue Projects ─────────────────────────
+function conn(caId, ids) {
+  var ca = document.getElementById(caId);
+  if (!ca) return;
+  var r = ca.getBoundingClientRect();
+  var cx = ids.map(function(id){
+    var b = document.getElementById(id).getBoundingClientRect();
+    return b.left + b.width / 2 - r.left;
+  });
+  var W = r.width, H = r.height, m = H / 2;
+  var mid = (cx[0] + cx[cx.length - 1]) / 2;
+  var svg = ca.querySelector("svg");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.innerHTML =
+    '<line x1="' + mid + '" y1="0" x2="' + mid + '" y2="' + m + '" stroke="#444" stroke-width="1.5"/>' +
+    '<line x1="' + cx[0] + '" y1="' + m + '" x2="' + cx[cx.length-1] + '" y2="' + m + '" stroke="#444" stroke-width="1.5"/>' +
+    cx.map(function(x){ return '<line x1="' + x + '" y1="' + m + '" x2="' + x + '" y2="' + H + '" stroke="#444" stroke-width="1.5"/>'; }).join("");
+}
+
+function drawConnectors() {
+  conn("rca", ["r0","r1","r2"]);
+  conn("mca", ["m0","m1","m2"]);
+  conn("vca", ["v0","v1","v2"]);
+  conn("eca", ["e0"]);
+}
+</script>
+</body>
+</html>
